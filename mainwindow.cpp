@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <QByteArray>
 #include <QDebug>
-
+#include <nodosimple.h>
 using namespace std;
 extern int yyrestart(FILE *archivo);
 extern int yyparse();
@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    lista = new SimpleList();
 }
 
 MainWindow::~MainWindow()
@@ -154,21 +155,23 @@ Nodo* MainWindow::switcher(Nodo* padre){
         if (valor=="false") tipo="tkFalse";
         }
         hijo->hijos.at(0)->setTipo(tipo);
+        lista->add(hijo->hijos.at(0)->token,tipo,"atributo",padre->token,-1,"NULL");
         if(tipo==asignacion->lexema){
             if(asignacion->lexema=="tEntero" || asignacion->lexema=="tDecimal"){
-                hijo->hijos.at(0)->setValor(atof(valor.c_str()));
+                lista->getNodeById(hijo->hijos.at(0)->token)->setValor(atof(valor.c_str()));
             }
             if(asignacion->lexema=="tCaracter" || asignacion->lexema=="tStr"){
-                hijo->hijos.at(0)->setValorS(valor);
+                lista->getNodeById(hijo->hijos.at(0)->token)->setValorS(valor);
             cout << endl << valor ;
             }
             if(asignacion->lexema=="tkTrue" || asignacion->lexema=="tkFalse"){
-            if(asignacion->lexema=="tkTrue") hijo->hijos.at(0)->setValor(1);
-            if(asignacion->lexema=="tkFalse") hijo->hijos.at(0)->setValor(0);
+            if(asignacion->lexema=="tkTrue") lista->getNodeById(hijo->hijos.at(0)->token)->setValor(1);
+            if(asignacion->lexema=="tkFalse") lista->getNodeById(hijo->hijos.at(0)->token)->setValor(0);
             }
             if(asignacion->lexema=="tId"){
-                if(asignacion->valor!=NULL) hijo->hijos.at(0)->setValor(asignacion->valor);
-                else hijo->hijos.at(0)->setValorS(asignacion->valorS);
+                NodoS* id2=lista->getNodeById(asignacion->token);
+                if(id2->getValor()!=NULL) lista->getNodeById(hijo->hijos.at(0)->token)->setValor(id2->getValor());
+                else lista->getNodeById(hijo->hijos.at(0)->token)->setValorS(id2->getValorS());
             }
         }else{
         cout << endl << "Tipo de variable no corresponde al valor igualado.";
@@ -201,9 +204,31 @@ Nodo* MainWindow::switcher(Nodo* padre){
         }else{
             //operacion + -
             Nodo* op1 = switcher(padre->hijos.at(0));
-            if(op1->lexema=="tId") double x = op1->valor;
-            Nodo* op2 = switcher(padre->hijos.at(0));
-            if(op2->lexema=="tId") double x2 = op2->valor;
+            NodoS *x1 = lista->getNodeById(op1->token);
+            string r1,r2,r;
+            if(op1->lexema=="tId"){
+            if(x1){
+                if(x1->valor!=-1) r1 = std::to_string(x1->valor);
+                else r1=x1->valorS;
+            }
+            else{ cout << endl << "Variable no declarada";}
+            }else{
+                r1=op1->token;
+            }
+            Nodo* op2 = switcher(padre->hijos.at(2));
+            NodoS *x2 = lista->getNodeById(op1->token);
+            if(op2->lexema=="tId"){
+                if(x2){
+                    cout << endl << "Variable declarada";
+                    if(x2->valor!=-1) r2 =std::to_string(x2->valor);
+                    else r2=x2->valorS;
+            }else{ cout << endl << "Variable no declarada";}
+            }else{
+                r2=op2->token;
+            }
+            r=r1+r2;
+            cout << endl << r;
+            cout << endl << "Prueba";
 
         }
 

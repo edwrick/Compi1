@@ -22,6 +22,8 @@ HEADERS  += mainwindow.h \
     sintact.y \
     lexico.h \
     sintact.h \
-    nodo.h
+    nodo.h \
+    nodosimple.h \
+    listasimple.h
 
 FORMS    += mainwindow.ui

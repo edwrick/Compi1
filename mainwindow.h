@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #include "nodo.h"
+#include "listasimple.h"
 #include <QMainWindow>
 
 namespace Ui {
@@ -12,6 +13,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    SimpleList*lista = new SimpleList();
     void Calcular(Nodo* padre);
     Nodo* switcher(Nodo* padre);
     explicit MainWindow(QWidget *parent = 0);
